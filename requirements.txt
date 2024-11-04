@@ -1,0 +1,7 @@
+art==6.3
+py7zr==0.22.0
+rarfile==4.2
+requests==2.32.3
+Telethon==1.37.0
+termcolor==2.5.0
+urllib3==2.2.3

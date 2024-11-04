@@ -1,0 +1,100 @@
+browser: Google Chrome
+profile: Default
+url: https://espace-client.orange.ma/sso/definir-mot-de-passe
+login: 0679898823
+password: HAhamimi1982@
+
+browser: Google Chrome
+profile: Default
+url: android://c_ijJfKIckOu6lfDZHgy0Psll1yvkf3vKGY3CSUzxW4HlVRuJyXMFquLN9gsv9ynmbCpJo0XlExBE_D7v1hmrw==@com.exness.android.pa/
+login: hmimizaid@gmail.com
+password: Hahamimizaid198
+
+browser: Google Chrome
+profile: Default
+url: https://www.terabox.com/arabic
+login: zaidhmimi12@gmail.com
+password: Hahamimizaid1@
+
+browser: Google Chrome
+profile: Default
+url: https://espace-client.yoxo.ma/sso/definir-mot-de-passe
+login: 0679898823
+password: HAhamimi1982@
+
+browser: Google Chrome
+profile: Default
+url: https://vocal.media/signin
+login: zaidhmimi12@gmail.com
+password: HAhamimizaid1982@
+
+browser: Google Chrome
+profile: Default
+url: https://app.getresponse.com/login
+login: zaidhmimi12@gmail.com
+password: HAhamimizaid1982@
+
+browser: Google Chrome
+profile: Default
+url: https://www.storyblocks.com/join/become-user
+login: zaidhmimi12@gmail.com
+password: Hahamimizaid1982@
+
+browser: Google Chrome
+profile: Default
+url: https://www.facebook.com/
+login: hmimizaid@gmail.com
+password: hahamimi1982
+
+browser: Google Chrome
+profile: Default
+url: android://BnX9M66KmaqmzgqWgQxmbrJB_wO0ST53-DUZCnxDdLwf4JAsUtM2kKGudjeBclJFUquAP2JTpypk9qobA6PGMA==@com.discord/
+login: +212679898823
+password: Hahamimizaid1982@
+
+browser: Google Chrome
+profile: Default
+url: http://192.168.1.1/admin.shtml
+login: admin
+password: gvt12345
+
+browser: Google Chrome
+profile: Default
+url: https://www.getresponse.com/affiliate-programs/recurring/signup
+login: zaidhmimi12@gmail.com
+password: HAhamimizaid1982@
+
+browser: Google Chrome
+profile: Default
+url: android://UhbMtiAExFNPNceArXxYL07lKDceJ9QVHwVTMl3pzL5rNOxCM_X2QHA1gQU6v-owOXcnLReVhwTYm3cRKSpFaQ==@com.picsart.studio/
+login: zaidhmimi12@gmail.com
+password: Hahamimi1982@
+
+browser: Google Chrome
+profile: Default
+url: android://zQxb6hXv1MJiC1Yyotdhi8HP-y7fwPcOLwPOWTwWKpP2VXcbsuIiI4iJ1KV0Dz3LzVsUuKJmYCBIUAxnsPB9FA==@com.facebook.katana/
+login: hmimizaid@gmail.com
+password: hahamimi1982
+
+browser: Google Chrome
+profile: Default
+url: http://192.168.1.1/html/ntwkall/wlan.asp
+login: GHITA
+password: 0987654321
+
+browser: Google Chrome
+profile: Default
+url: https://www.terabox.com/arabic/login/resetpassword
+login: 
+password: zaidhmimi12@gmail.com
+
+browser: Google Chrome
+profile: Default
+url: https://mega.nz/file/AJMVRKZA
+login: davidsreco40@gmail.com
+password: Hahamimizaid1982@
+
+browser: Google Chrome
+profile: Default
+url: https://app.metricool.com/register
+login: zaidhmimi12@gmail.com
