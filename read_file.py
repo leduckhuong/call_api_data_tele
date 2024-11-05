@@ -3,15 +3,17 @@ import json
 import asyncio
 from check_file_format import check_file_format
 from check_line_format import check_line_format
-from check_extension import check_extension
+from check_file_extension import check_file_extension
 from save_data import save_data
+from save_data import client
 from check_custom_mail import check_custom_mail
 
 async def read_file(path):
     try:
         if os.path.isfile(path):
-            if check_file(path):
+            if check_file_extension(path):
                 _, file_extension = os.path.splitext(path)
+                file_name = os.path.basename(path)
                 if file_extension == ".txt":
                     file_format = check_file_format(path)
                     if file_format == 1:
@@ -20,109 +22,96 @@ async def read_file(path):
                                 line = line.strip()
                                 format_type = check_line_format(line)
                                 if format_type == 1:
-                                    pos1 = line.rfind(":")  # tìm dấu : cuối cùng
-                                    pos2 = line.rfind(":", 0, pos1)  # tìm dấu : thứ 2 từ cuối
+                                    pos1 = line.rfind(":")  
+                                    pos2 = line.rfind(":", 0, pos1)  
 
                                     # Cắt chuỗi
                                     base_url = line[:pos2]
-                                    username = line[pos2 + 1: pos1]
+                                    mail = line[pos2 + 1: pos1]
                                     password = line[pos1 + 1:]
-                                    await save_data("", "", base_url, username, password, "", "")
+                                    await save_data("", file_name, base_url, mail, password, "", "")
                                     print("URL:", base_url)
-                                    print("Username:", username)
+                                    print("mail:", mail)
                                     print("Password:", password)
                                 elif format_type == 2:
-                                    pos1 = line.rfind(":")  # tìm dấu : cuối cùng
-                                    pos2 = line.rfind(" ", 0, pos1)  # tìm khoảng trắng
+                                    pos1 = line.rfind(":")  
+                                    pos2 = line.rfind(" ", 0, pos1) 
 
                                     # Cắt chuỗi
                                     base_url = line[:pos2]
-                                    username = line[pos2 + 1: pos1]
+                                    mail = line[pos2 + 1: pos1]
                                     password = line[pos1 + 1:]
-                                    await save_data("", "", base_url, username, password, "", "")
+                                    await save_data("", file_name, base_url, mail, password, "", "")
                                     print("URL:", base_url)
-                                    print("Username:", username)
+                                    print("Mail:", mail)
                                     print("Password:", password)
                                 elif format_type == 3:
-                                    pos1 = line.find(":")  # tìm dấu : 
-                                    pos2 = line.find("\t")  # tìm tab
-                                    username = line[:pos1]
+                                    pos1 = line.find(":")  
+                                    pos2 = line.find("\t")  
+                                    mail = line[:pos1]
                                     password = line[pos1+1:pos2]
                                     base_url = line[pos2:].strip()
 
-                                    await save_data("", "", base_url, username, password, "", "")
+                                    await save_data("", file_name, base_url, mail, password, "", "")
                                     print("URL:", base_url)
-                                    print("Username:", username)
+                                    print("Mail:", mail)
                                     print("Password:", password)
 
                                 elif format_type == 4:
-                                    pos1 = line.rfind(" ")  # tìm khoảng trắng  cuối cùng
-                                    pos2 = line.rfind(":", 0, pos1)  # tìm dấu ":"
+                                    pos1 = line.rfind(" ")  
+                                    pos2 = line.rfind(":", 0, pos1)  
 
-                                    username = line[:pos2]
-                                    if check_custom_mail(username):
+                                    mail = line[:pos2]
+                                    if check_custom_mail(mail):
                                         password = line[pos2 + 1: pos1]
-                                        await save_data("", "", "", username, password, "", "")
-                                        print("Username:", username)
+                                        await save_data("", file_name, "", mail, password, "", "")
+                                        print("Mail:", mail)
                                         print("Password:", password)
                                 elif format_type == 5:
-                                    # Chuyển chuỗi JSON thành dictionary
-                                    parsed_data = json.loads(line)
-
-                                    # Lấy giá trị của các khóa "name", "phone", "email"
-                                    email = parsed_data.get("email")
-                                    if check_custom_mail(username):
-                                        name = parsed_data.get("name")
-                                        phone = parsed_data.get("phone")
-                                        await save_data("", "", "", username, password, name, phone)
-                                        print("Name:", name)
-                                        print("Phone:", phone)
-                                        print("Email:", email)
-                                elif format_type == 6:
-                                    username, password = line.split(":")
+                                    mail, password = line.split(":")
                                     if check_custom_mail(mail):
-                                        await save_data("", "", "", username, password, "", "")
-                                        print("Username:", username)
+                                        await save_data("", file_name, "", mail, password, "", "")
+                                        print("Mail:", mail)
                                         print("Password:", password)
                     elif file_format == 2:
                         with open(path) as file:
                             content = file.read()  
                             block = content.split("\n\n")  
                             for item in block:
-                                url, user, password = "","",""
+                                url, mail, password = "","",""
                                 lines_item = item.split("\n")
                                 for line_item in lines_item:
                                     pos1 = line_item.find(":")
                                     if "url" in line_item:
                                         url = line_item[pos1+1:]
                                     if "login" in line_item:
-                                        user = line_item[pos1+1:]
+                                        mail = line_item[pos1+1:]
                                     if "password" in line_item:
                                         password = line_item[pos1+1:]
                                 print("Url: ", url)
-                                print("User: ", user)
+                                print("Mail: ", mail)
                                 print("Password: ", password)
                     elif file_format == 3:
                         with open(path) as file:
                             content = file.read()  
                             block = content.split("\n===============")
                             for item in block:
-                                url, user, password = "", "", ""
+                                url, mail, password = "", "", ""
                                 lines_item = item.split("\n")
                                 for line_item in lines_item:
                                     pos1 = line_item.find(":")
                                     if "URL" in line_item:
                                         url = line_item[pos1 + 1:].strip()
-                                    if "Username" in line_item:
-                                        user = line_item[pos1 + 1:].strip()
+                                    if "Mail" in line_item:
+                                        mail = line_item[pos1 + 1:].strip()
                                     if "Password" in line_item:
                                         password = line_item[pos1 + 1:].strip()
                                 print("Url: ", url)
-                                print("User: ", user)
+                                print("Mail: ", mail)
                                 print("Password: ", password)
             # Xóa file sau khi đã đọc và xử lý
-            os.remove(path)
-            print(f"File {path} has been processed and deleted.")
+            # os.remove(path)
+            # print(f"File {path} has been processed and deleted.")
 
         elif os.path.isdir(path):
             for item in os.listdir(path):
@@ -132,7 +121,7 @@ async def read_file(path):
         print(f"Error: {e}")
 
 async def main():
-    path = "./storage/test4.txt"
+    path = "./storage/test2.txt"
     await read_file(path)
 
 if __name__ == "__main__":

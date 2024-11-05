@@ -7,7 +7,7 @@ config = configparser.ConfigParser()
 config.read('config.ini')
 
 # Thông tin đăng nhập Telegram của bạn
-api_id=config['TELE_API']['APP_ID']
+api_id = config['TELE_API']['APP_ID']
 api_hash = config['TELE_API']['HASH_ID']
 
 # Tạo client Telegram
@@ -33,6 +33,12 @@ async def handle_event(event):
                         await client.download_media(message, file=download_path)
                         
                         print(f"File '{file_name}' downloaded to {download_path}")
+
+                        
+
                     except Exception as error:
                         print("Error while downloading:", error)
                     break  # Thoát sau khi tải xong file đầu tiên
+
+client.start()
+client.run_until_disconnected()

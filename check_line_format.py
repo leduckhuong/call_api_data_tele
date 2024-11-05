@@ -1,3 +1,9 @@
+import re
+
+def is_valid_mail_password(string):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.[a-zA-Z]{2,}:.+$'
+    return bool(re.match(pattern, string))
+
 def check_line_format(line):
     # url:user:pass
     # url:mail:pass
@@ -10,12 +16,9 @@ def check_line_format(line):
     elif (line.count(":")==2 and ("http://" in line or "https://" in line or "apk://" in line)):
         return 3
     # Mail:pass date
-    elif (line.count(":")==1 and line.count(" ") == 1):
+    elif (is_valid_mail_password(line) and line.count(":")==1 and line.count(" ") == 1):
         return 4
-    # {"id": "f67ca3bf-04c4-4e1f-bf56-f6951b2113bf", "name": "Илья", "phone": "+79998590783", "email": "ilya89999691659@gmail.com", "roles": "", "status": "ACTIVE", "organizations": [], "operationAreas": []}
-    elif ("name" in line and "phone" in line and "email" in line):
-        return 5
     # user:pass
-    elif (line.count(":")==1):
-        return 6
-    return 7
+    elif (is_valid_mail_password(line) and line.count(":")==1):
+        return 5
+    return 6
