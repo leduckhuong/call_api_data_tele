@@ -10,11 +10,12 @@ api_hash = config['TELE_API']['HASH_ID']
 
 client = TelegramClient('session_name', api_id, api_hash)
 
-id_messages = [-4520503739]  
+id_messages = [4520503739]  
 
 async def fetch_previous_messages(channel_id):
     count = 0
     try:
+        print(type(channel_id))
         # Lấy entity của channel
         entity = await client.get_entity(channel_id)
         

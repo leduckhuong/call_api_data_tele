@@ -5,8 +5,7 @@ from datetime import date, datetime
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError, ChannelPrivateError, ChannelInvalidError
 from telethon.tl.functions.messages import GetHistoryRequest
-from telethon.tl.types import PeerChannel, InputPeerChannel, Channel
-from check_chat_type import check_chat_type
+from telethon.tl.types import PeerChannel, InputPeerChannel, Channel, PeerUser, PeerChat
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -15,6 +14,18 @@ class DateTimeEncoder(json.JSONEncoder):
         if isinstance(obj, bytes):
             return list(obj)
         return json.JSONEncoder.default(self, obj)
+
+def check_chat_type(chat_id):
+    """
+    Helper function to determine the chat type from the chat ID.
+    Returns True if the chat is a channel, False otherwise.
+    """
+    if str(chat_id).startswith('-100'):
+        return True
+    elif str(chat_id).startswith('-'):
+        return False
+    else:
+        return True
 
 async def get_channel_entity(client, channel_id):
     """Helper function to get channel entity with proper error handling"""
@@ -29,7 +40,6 @@ async def get_channel_entity(client, channel_id):
             print(f"Attempting to access channel with ID: {channel_id}")
             
             # Try getting the channel directly
-            
             channel = await client.get_entity(PeerChannel(channel_id))
             return channel
         else:
@@ -94,9 +104,10 @@ async def main(phone):
                 break
                 
             messages = history.messages
+            index = 0
             for message in messages:
-                # if message.media:
-                    # print(message.media)
+                index = index + 1
+                print(index)
                 # Convert message to dict and add additional metadata
                 msg_dict = message.to_dict()
                 msg_dict['channel_id'] = my_channel.id
@@ -145,7 +156,7 @@ async def main(phone):
 config = configparser.ConfigParser()
 config.read("config.ini")
 
-api_id = config['TELE_API']['APP_ID']
+api_id = int(config['TELE_API']['APP_ID'])
 api_hash = str(config['TELE_API']['HASH_ID'])
 phone = config['TELE_API']['PHONE']
 username = config['TELE_API']['USERNAME']
