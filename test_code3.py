@@ -1,3 +1,4 @@
+import os
 import configparser
 import json
 import asyncio
@@ -5,7 +6,7 @@ from datetime import date, datetime
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError, ChannelPrivateError, ChannelInvalidError
 from telethon.tl.functions.messages import GetHistoryRequest
-from telethon.tl.types import PeerChannel, InputPeerChannel, Channel, PeerUser, PeerChat
+from telethon.tl.types import PeerChannel, InputPeerChannel, Channel, PeerUser, PeerChat, MessageMediaDocument
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -53,6 +54,61 @@ async def get_channel_entity(client, channel_id):
     except Exception as e:
         print(f'Error accessing channel: {str(e)}')
         raise
+
+async def progress_callback(current, total):
+    percentage = (current / total) * 100
+    print(f'Downloading file: {current}/{total} bytes ({percentage:.2f}%)')
+
+def check_file_exist(dir_path, file):
+    file_path = os.path.join(dir_path, file)
+    return os.path.exists(file_path)
+
+async def download_message_media(client, message, download_dir='./storage'):
+    try:
+        # Create storage directory
+        os.makedirs(download_dir, exist_ok=True)
+        
+        # Get the original message object from Telethon, not the dict version
+        original_message = await client.get_messages(message['channel_id'], ids=message['id'])
+        
+        if not original_message or not original_message.media:
+            print("No media found in original message")
+            return None
+        
+        # Get file name
+        file_name = None
+        if hasattr(original_message.media, 'document') and original_message.media.document:
+            for attribute in original_message.media.document.attributes:
+                if hasattr(attribute, 'file_name'):
+                    file_name = attribute.file_name
+                    break
+        
+        if not file_name:
+            file_name = f"document_{message['id']}"
+            
+        download_path = os.path.join(download_dir, file_name)
+        print(f"Attempting to download: {file_name}")
+        
+        
+        # Download using original message object
+        file_path = await client.download_media(
+            original_message.media,
+            file=download_path,
+            progress_callback=progress_callback
+        )
+        
+        if file_path:
+            print(f'Successfully downloaded to: {file_path}')
+            return file_path
+        else:
+            print(f'Download failed for: {file_name}')
+            return None
+            
+    except Exception as e:
+        print(f'Error during download: {str(e)}')
+        import traceback
+        print("Full error:", traceback.format_exc())
+        return None
 
 async def main(phone):
     try:
@@ -120,8 +176,6 @@ async def main(phone):
                 
             for index, message in enumerate(all_messages):
                 if message.get('media') and message['media'].get('document') is not None:
-                    print(f'Found document in message at index {index}')
-                    
                     # Kiểm tra và lấy tên file
                     try:
                         attributes = message['media']['document'].get('attributes', [])
@@ -130,30 +184,23 @@ async def main(phone):
                         else:
                             file_name = f'document_{index}'  # Đặt tên mặc định nếu không có `file_name`
                         
-                        download_path = f'./storage/{file_name}'
-                        print(f'Downloading file to: {download_path}')
+                        download_dir = './storage/'
                         
-                        # Tải file về thư mục đã chỉ định với progress_callback để kiểm tra quá trình tải về
-                        file_path = await client.download_media(
-                            message, 
-                            file=download_path, 
-                            progress_callback=lambda current, total: print(f"Downloading {file_name}: {current}/{total} bytes")
-                        )
-                        
-                        if file_path:
-                            print(f'Downloaded file: {file_path}')
-                        else:
-                            print(f'Failed to download file: {file_name}')
-                    
+                        if not check_file_exist(download_dir, file_name):
+
+                            file_path = await download_message_media(client, message, download_dir)
+            
+                            if file_path:
+                                print(f'Successfully downloaded file: {file_path}')
+                            else:
+                                print(f'Failed to download file from message {index}')
+
                     except Exception as e:
-                        print(f"Error downloading file at index {index}: {str(e)}")
-                    
-                # Thoát khỏi vòng lặp sau khi tải đủ số lượng tin nhắn cần thiết
+                        print(f'Error downloading {e}')
+
                 if index == 10:
-                    print('Index is 10, breaking loop.')
+                    print('Reached message limit, stopping.')
                     break
-
-
         else:
             print('No messages were retrieved')
 
