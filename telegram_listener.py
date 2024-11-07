@@ -9,9 +9,10 @@ config.read('config.ini')
 # Thông tin đăng nhập Telegram của bạn
 api_id = config['TELE_API']['APP_ID']
 api_hash = config['TELE_API']['HASH_ID']
+username = config['TELE_API']['USERNAME']
 
 # Tạo client Telegram
-client = TelegramClient('session_name', api_id, api_hash)
+client = TelegramClient(username, api_id, api_hash)
 
 os.makedirs('./storage', exist_ok=True)
 

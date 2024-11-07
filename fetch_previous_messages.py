@@ -2,11 +2,14 @@ import os
 import configparser
 import json
 import asyncio
-from datetime import date, datetime
+from datetime import datetime
 from telethon import TelegramClient
 from telethon.errors import SessionPasswordNeededError, ChannelPrivateError, ChannelInvalidError
 from telethon.tl.functions.messages import GetHistoryRequest
-from telethon.tl.types import PeerChannel, InputPeerChannel, Channel, PeerUser, PeerChat, MessageMediaDocument
+
+from get_channel_entity import get_channel_entity
+from check_file_exist import check_file_exist
+from download_message_media import download_message_media
 
 class DateTimeEncoder(json.JSONEncoder):
     def default(self, obj):
@@ -15,100 +18,6 @@ class DateTimeEncoder(json.JSONEncoder):
         if isinstance(obj, bytes):
             return list(obj)
         return json.JSONEncoder.default(self, obj)
-
-def check_chat_type(chat_id):
-    '''
-    Helper function to determine the chat type from the chat ID.
-    Returns True if the chat is a channel, False otherwise.
-    '''
-    if str(chat_id).startswith('-100'):
-        return True
-    return False
-
-async def get_channel_entity(client, channel_id):
-    
-    try:
-        if check_chat_type(channel_id):
-            # Remove the -100 prefix if present
-            if str(channel_id).startswith('-100'):
-                channel_id = int(str(channel_id)[4:])
-            print(f'Attempting to access channel with ID: {channel_id}')
-            
-            # Try getting the channel directly
-            channel = await client.get_entity(PeerChannel(channel_id))
-            
-            return channel
-        else:
-            channel = await client.get_entity(int(channel_id))
-            return channel
-        
-    except ValueError as e:
-        print(f'ValueError: {str(e)}')
-        raise
-    except ChannelPrivateError:
-        print('This is a private channel. Please make sure you have joined it.')
-        raise
-    except ChannelInvalidError:
-        print('This channel is invalid or not accessible.')
-        raise
-    except Exception as e:
-        print(f'Error accessing channel: {str(e)}')
-        raise
-
-async def progress_callback(current, total):
-    percentage = (current / total) * 100
-    print(f'Downloading file: {current}/{total} bytes ({percentage:.2f}%)')
-
-def check_file_exist(dir_path, file):
-    file_path = os.path.join(dir_path, file)
-    return os.path.exists(file_path)
-
-async def download_message_media(client, message, download_dir='./storage'):
-    try:
-        # Create storage directory
-        os.makedirs(download_dir, exist_ok=True)
-        
-        # Get the original message object from Telethon, not the dict version
-        original_message = await client.get_messages(message['channel_id'], ids=message['id'])
-        
-        if not original_message or not original_message.media:
-            print("No media found in original message")
-            return None
-        
-        # Get file name
-        file_name = None
-        if hasattr(original_message.media, 'document') and original_message.media.document:
-            for attribute in original_message.media.document.attributes:
-                if hasattr(attribute, 'file_name'):
-                    file_name = attribute.file_name
-                    break
-        
-        if not file_name:
-            file_name = f"document_{message['id']}"
-            
-        download_path = os.path.join(download_dir, file_name)
-        print(f"Attempting to download: {file_name}")
-        
-        
-        # Download using original message object
-        file_path = await client.download_media(
-            original_message.media,
-            file=download_path,
-            progress_callback=progress_callback
-        )
-        
-        if file_path:
-            print(f'Successfully downloaded to: {file_path}')
-            return file_path
-        else:
-            print(f'Download failed for: {file_name}')
-            return None
-            
-    except Exception as e:
-        print(f'Error during download: {str(e)}')
-        import traceback
-        print("Full error:", traceback.format_exc())
-        return None
 
 async def main(phone):
     try:
@@ -170,10 +79,7 @@ async def main(phone):
         print(f'Total messages retrieved: {total_messages}')
         
         if all_messages:
-            output_file = f'channel_messages_{my_channel.id}.json'
-            with open(output_file, 'w', encoding='utf-8') as outfile:
-                json.dump(all_messages, outfile, cls=DateTimeEncoder, ensure_ascii=False, indent=2)
-                
+            
             for index, message in enumerate(all_messages):
                 if message.get('media') and message['media'].get('document') is not None:
                     # Kiểm tra và lấy tên file
@@ -184,9 +90,10 @@ async def main(phone):
                         else:
                             file_name = f'document_{index}'  # Đặt tên mặc định nếu không có `file_name`
                         
-                        download_dir = './storage/'
+                        history_file = './history.txt'
+                        download_dir = './storage'
                         
-                        if not check_file_exist(download_dir, file_name):
+                        if not check_file_exist(history_file, file_name):
 
                             file_path = await download_message_media(client, message, download_dir)
             
@@ -197,10 +104,6 @@ async def main(phone):
 
                     except Exception as e:
                         print(f'Error downloading {e}')
-
-                if index == 10:
-                    print('Reached message limit, stopping.')
-                    break
         else:
             print('No messages were retrieved')
 
