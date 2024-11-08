@@ -7,9 +7,6 @@ async def download_message_media(client, message, download_dir='./storage'):
         # Create storage directory
         os.makedirs(download_dir, exist_ok=True)
         
-        # Get the original message object from Telethon, not the dict version
-        # original_message = await client.get_messages(message['channel_id'], ids=message['id'])
-        # original_message = await client.get_messages(message.chat_id, ids=message.id)
         print(message)
         original_message = None
         if 'channel_id' in message:  # Nếu có key 'channel_id'
