@@ -60,16 +60,14 @@ async def extract_7z(sevenz_file_path, extract_file_path, password=None):
         print(f"Error: {str(e)}")
 
 
-async extract_file(file_path, extract_file_path):
+async def extract_file(file_path, extract_file_path):
     _, file_extension = os.path.splitext(file_path)
     file_name = os.path.basename(path)
     if (file_extension == '.zip'):
         await extract_zip(file_path, extract_file_path)
     if (file_extension == '.rar'):
-        extract_file_path = './storage/'+file_name
         await extract_zip(file_path, extract_file_path)
     if (file_extension == '.7z'):
-        extract_file_path = './storage/'+file_name
         await extract_zip(file_path, extract_file_path)
 
 def main():

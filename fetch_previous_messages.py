@@ -8,7 +8,7 @@ from telethon.errors import SessionPasswordNeededError, ChannelPrivateError, Cha
 from telethon.tl.functions.messages import GetHistoryRequest
 
 from get_channel_entity import get_channel_entity
-from check_file_exist import check_file_exist
+from check_file_downloaded import check_file_downloaded
 from download_message_media import download_message_media
 
 class DateTimeEncoder(json.JSONEncoder):
@@ -66,7 +66,10 @@ async def main(phone):
             for message in messages:
                 # Convert message to dict and add additional metadata
                 msg_dict = message.to_dict()
-                msg_dict['channel_id'] = my_channel.id
+                if hasattr(message.peer_id, 'chat_id'):
+                    msg_dict['chat_id'] = message.peer_id.chat_id
+                elif hasattr(message.peer_id, 'channel_id'):
+                    msg_dict['channel_id'] = message.peer_id.channel_id
                 msg_dict['channel_title'] = getattr(my_channel, 'title', 'Unknown')
                 all_messages.append(msg_dict)
             
@@ -90,10 +93,10 @@ async def main(phone):
                         else:
                             file_name = f'document_{index}'  # Đặt tên mặc định nếu không có `file_name`
                         
-                        history_file = './history.txt'
+                        history_file = './history_downloaded.txt'
                         download_dir = './storage'
                         
-                        if not check_file_exist(history_file, file_name):
+                        if not check_file_downloaded(history_file, file_name):
 
                             file_path = await download_message_media(client, message, download_dir)
             

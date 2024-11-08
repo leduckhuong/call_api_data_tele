@@ -5,12 +5,14 @@ import asyncio
 from check_file_format import check_file_format
 from check_line_format import check_line_format
 from check_file_valid import check_file_valid
-from save_data import save_data
-from save_data import client
+from check_compress_file import check_compress_file
+from save_data import save_data, client
 from check_custom_mail import check_custom_mail
 from extract_file import extract_file
+from append_filename_history import append_filename_history
 
 async def read_file(path):
+    print(path)
     try:
         if os.path.isfile(path):
             if not check_compress_file(path):

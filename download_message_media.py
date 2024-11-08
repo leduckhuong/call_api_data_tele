@@ -8,8 +8,19 @@ async def download_message_media(client, message, download_dir='./storage'):
         os.makedirs(download_dir, exist_ok=True)
         
         # Get the original message object from Telethon, not the dict version
-        original_message = await client.get_messages(message['channel_id'], ids=message['id'])
-        
+        # original_message = await client.get_messages(message['channel_id'], ids=message['id'])
+        # original_message = await client.get_messages(message.chat_id, ids=message.id)
+        print(message)
+        original_message = None
+        if 'channel_id' in message:  # Nếu có key 'channel_id'
+            print('Message has channel id')
+            original_message = await client.get_messages(message['channel_id'], ids=message['id'])
+        elif 'chat_id' in message:  # Nếu có key 'chat_id'
+            print('Message has chat id')
+            original_message = await client.get_messages(message['chat_id'], ids=message['id'])
+        else:
+            print("Message does not contain channel_id or chat_id.")
+            
         if not original_message or not original_message.media:
             print("No media found in original message")
             return None

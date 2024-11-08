@@ -1,6 +1,6 @@
 import os
 
-def check_file_exist(history_file, file_name):
+def check_file_downloaded(history_file, file_name):
     try:
         # Kiểm tra file có tồn tại không
         if not os.path.exists(history_file):
